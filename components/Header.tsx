@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { Vote, Menu, X } from 'lucide-react';
 import { useState, useCallback } from 'react';
+import AuthButton from './AuthButton';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -48,7 +49,7 @@ export default function Header() {
           </Link>
         </nav>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           <div
             className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent border border-border"
             aria-label="India — system online"
@@ -56,6 +57,9 @@ export default function Header() {
             <span className="text-xs font-semibold text-secondary">INDIA</span>
             <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" aria-hidden="true" />
           </div>
+
+          {/* Auth button — shows sign-in or user avatar */}
+          <AuthButton />
 
           <button
             className="md:hidden p-2 text-secondary rounded-md hover:bg-accent transition-colors"

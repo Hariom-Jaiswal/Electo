@@ -30,7 +30,7 @@
   --primary: #2563eb;
   --primary-foreground: #ffffff;
 
-  --secondary: #64748b;
+  --secondary: #475569; /* Darkened from #64748b for WCAG AA contrast compliance */
   --secondary-foreground: #f8fafc;
 
   --accent: #f1f5f9;

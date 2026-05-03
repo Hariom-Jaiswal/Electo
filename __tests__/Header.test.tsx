@@ -1,3 +1,16 @@
+// Mock Firebase to avoid needing real credentials in tests
+jest.mock('@/lib/firebase', () => ({
+  app: {},
+  db: {},
+  auth: {},
+}));
+
+// Mock AuthProvider to control auth state in tests
+jest.mock('@/components/AuthProvider', () => ({
+  AuthProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  useAuth: () => ({ user: null, loading: false, signInWithGoogle: jest.fn(), signOut: jest.fn() }),
+}));
+
 import { render, screen, fireEvent } from '@testing-library/react';
 import Header from '@/components/Header';
 

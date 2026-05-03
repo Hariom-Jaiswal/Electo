@@ -8,23 +8,24 @@ ElectoAI is a premium, AI-driven election assistant designed to empower citizens
 
 ## ✨ Key Features
 
--   **🤖 Intelligent AI Assistant**: Powered by **Gemini 2.5 Flash**, providing real-time answers to complex voting queries, registration deadlines, and polling procedures.
--   **📅 Interactive Election Timeline**: A dynamic, status-driven visualization of the entire election cycle, from notification to results.
--   **📚 Knowledge Hub**: A curated library of step-by-step guides for every type of voter (First-time, Overseas, PWD, etc.).
--   **🛡️ Trust-First Design**: Implemented with high-end glassmorphism, responsive layouts, and a strictly factual, neutral AI persona.
--   **💾 Session Persistence**: Securely stores chat history using **Firebase Firestore** for a personalized experience.
+-   **🤖 Enterprise AI**: Powered by **Google Vertex AI** (Gemini 1.5 Flash) for production-grade reliability and low-latency responses.
+-   **📅 Interactive Timeline**: A dynamic, status-driven visualization of the entire election cycle.
+-   **📚 Knowledge Hub**: A curated library of step-by-step guides for diverse voter demographics.
+-   **🛡️ Production Hardened**: Implemented with **Structured Cloud Logging**, **IP-based Rate Limiting**, and strict **Security Headers**.
+-   **💾 Cloud Persistence**: Securely stores chat history using **Firebase Firestore** with **Firebase Auth** (Google Sign-In).
+-   **📈 Real-time Analytics**: Integrated with **Firebase Analytics** and **Performance Monitoring**.
 
 ---
 
 ## 🛠️ Tech Stack
 
 -   **Framework**: [Next.js 16 (App Router)](https://nextjs.org/)
--   **AI Engine**: [Google Gemini 2.5 Flash](https://ai.google.dev/)
+-   **AI Platform**: [Google Cloud Vertex AI](https://cloud.google.com/vertex-ai)
+-   **Database/Auth**: [Google Firebase](https://firebase.google.com/) (Firestore, Analytics, Performance)
+-   **Observability**: [Google Cloud Logging](https://cloud.google.com/logging) (Structured JSON)
 -   **Styling**: [Tailwind CSS 4](https://tailwindcss.com/)
--   **Database/Auth**: [Firebase](https://firebase.google.com/)
--   **Icons**: [Lucide React](https://lucide.dev/)
--   **Testing**: [Jest](https://jestjs.io/) & [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/)
--   **Deployment**: [Google Cloud Run](https://cloud.google.com/run) + [Artifact Registry](https://cloud.google.com/artifact-registry)
+-   **Testing**: [Jest](https://jestjs.io/) & [React Testing Library](https://testing-library.com/)
+-   **Infrastructure**: [Google Cloud Run](https://cloud.google.com/run) (Serverless Containerization)
 
 ---
 

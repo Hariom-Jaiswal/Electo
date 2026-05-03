@@ -1,17 +1,38 @@
 import { POST } from '@/app/api/chat/route';
 
+// Mock Firebase
+jest.mock('@/lib/firebase', () => ({
+  db: {},
+  app: {},
+  auth: {},
+}));
+
+jest.mock('firebase/firestore', () => ({
+  collection: jest.fn(),
+  addDoc: jest.fn(),
+  serverTimestamp: jest.fn(),
+}));
+
 // Mock the Gemini library
 jest.mock('@/lib/gemini', () => ({
   model: {
     startChat: jest.fn().mockReturnValue({
       sendMessage: jest.fn().mockResolvedValue({
         response: {
-          text: () => 'Mock AI Response',
+          candidates: [
+            {
+              content: {
+                parts: [{ text: 'Mock AI Response' }],
+              },
+            },
+          ],
         },
       }),
     }),
   },
-  chatConfig: {},
+  chatConfig: {
+    generationConfig: {},
+  },
 }));
 
 // Mock env validation

@@ -2,13 +2,9 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Send, Bot, User, Sparkles, Loader2 } from 'lucide-react';
-
-interface Message {
-  id: string;
-  role: 'user' | 'assistant';
-  content: string;
-  timestamp: Date;
-}
+import type { Message } from '@/lib/types';
+import { trackChatQuery, initPerformance } from '@/lib/analytics';
+import { useAuth } from './AuthProvider';
 
 const WELCOME_MESSAGE: Message = {
   id: 'welcome',
@@ -19,7 +15,9 @@ const WELCOME_MESSAGE: Message = {
 };
 
 export default function ChatWindow() {
-  // --- All state declarations at the top (Code Quality) ---
+  const { user } = useAuth();
+
+  // All state declarations at the top
   const [messages, setMessages] = useState<Message[]>([]);
   const [isMounted, setIsMounted] = useState(false);
   const [input, setInput] = useState('');
@@ -31,11 +29,14 @@ export default function ChatWindow() {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsMounted(true);
     setMessages([WELCOME_MESSAGE]);
+    initPerformance(); // Initialize Firebase Performance Monitoring
   }, []);
 
-  // useCallback prevents re-creating this function on every render (Efficiency)
+  // Use requestAnimationFrame to avoid forced reflow from scrollIntoView (Lighthouse fix)
   const scrollToBottom = useCallback(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    requestAnimationFrame(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    });
   }, []);
 
   useEffect(() => {
@@ -45,13 +46,15 @@ export default function ChatWindow() {
   const handleSend = useCallback(async () => {
     if (!input.trim() || isLoading) return;
 
-    // Use crypto.randomUUID for proper unique IDs (Code Quality)
     const userMessage: Message = {
       id: crypto.randomUUID(),
       role: 'user',
       content: input.trim(),
       timestamp: new Date(),
     };
+
+    // Track analytics event
+    trackChatQuery(userMessage.content.length);
 
     setMessages((prev) => [...prev, userMessage]);
     setInput('');
@@ -66,6 +69,7 @@ export default function ChatWindow() {
             role: m.role,
             content: m.content,
           })),
+          userId: user?.uid ?? null, // Pass user ID for session persistence
         }),
       });
 
@@ -83,7 +87,6 @@ export default function ChatWindow() {
       };
       setMessages((prev) => [...prev, assistantMessage]);
     } catch (error: unknown) {
-      console.error('Chat Error:', error);
       const errorMessage: Message = {
         id: crypto.randomUUID(),
         role: 'assistant',
@@ -94,7 +97,7 @@ export default function ChatWindow() {
     } finally {
       setIsLoading(false);
     }
-  }, [input, isLoading, messages]);
+  }, [input, isLoading, messages, user]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -122,11 +125,11 @@ export default function ChatWindow() {
             <Bot className="h-6 w-6" />
           </div>
           <div>
-            <h3 className="font-bold text-foreground">ElectoAI Assistant</h3>
+            <p className="font-bold text-foreground">ElectoAI Assistant</p>
             <div className="flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-green-500" aria-hidden="true" />
               <span className="text-[10px] font-bold text-secondary uppercase tracking-wider">
-                Online
+                {user ? `Signed in as ${user.displayName?.split(' ')[0]}` : 'Online'}
               </span>
             </div>
           </div>
@@ -134,7 +137,7 @@ export default function ChatWindow() {
         <Sparkles className="h-5 w-5 text-primary" aria-hidden="true" />
       </div>
 
-      {/* Messages — role="log" for screen readers (Accessibility) */}
+      {/* Messages */}
       <div
         className="flex-1 overflow-y-auto p-6 space-y-6 bg-accent/20"
         role="log"

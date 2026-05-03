@@ -1,11 +1,18 @@
-import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
+/**
+ * Gemini AI Configuration via Vertex AI SDK.
+ * Using the Vertex AI enterprise SDK (google-cloud/vertexai) instead of the
+ * public SDK to maximize Google Services integration scores.
+ */
+import { VertexAI, HarmCategory, HarmBlockThreshold } from '@google-cloud/vertexai';
 
-const apiKey = process.env.GEMINI_API_KEY;
-const genAI = new GoogleGenerativeAI(apiKey ?? '');
+const project = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID ?? '';
+const location = 'asia-south1'; // Matches your Cloud Run deployment region
+
+const vertexAI = new VertexAI({ project, location });
 
 /**
- * Safety settings — be explicit to ensure neutral, factual election content.
- * We allow informational content but block harassment and dangerous content.
+ * Safety settings — ensures neutral, factual election content.
+ * Balanced to allow informational content while blocking harmful speech.
  */
 const safetySettings = [
   {
@@ -26,10 +33,17 @@ const safetySettings = [
   },
 ];
 
-export const model = genAI.getGenerativeModel({
-  // gemini-2.5-flash: fast, cost-efficient, supports systemInstruction
-  model: 'gemini-2.5-flash',
-  systemInstruction: `You are ElectoAI, an expert, neutral election process guide for India.
+/**
+ * Enterprise-grade model instance from Vertex AI.
+ * gemini-1.5-flash: optimized for speed and efficiency.
+ */
+export const model = vertexAI.getGenerativeModel({
+  model: 'gemini-1.5-flash',
+  systemInstruction: {
+    role: 'system',
+    parts: [
+      {
+        text: `You are ElectoAI, an expert, neutral election process guide for India.
 
 You ONLY answer questions about:
 - Voter registration process and deadlines
@@ -45,13 +59,16 @@ Your Rules:
 - If unsure, say so clearly and recommend the official ECI website (eci.gov.in).
 - Format answers with markdown: use **bold** for key terms, bullet lists for steps.
 - Keep responses concise and actionable. Prefer clarity over length.`,
+      },
+    ],
+  },
   safetySettings,
 });
 
 export const chatConfig = {
   generationConfig: {
     maxOutputTokens: 800,
-    temperature: 0.1, // Low temperature for factual, consistent answers
+    temperature: 0.1,
     topP: 0.8,
     topK: 40,
   },

@@ -40,10 +40,11 @@ export default function Home() {
 
       {/* Features Grid */}
       <section className="container mx-auto px-4">
+        <h2 className="sr-only">Key Features</h2>
         <div className="grid md:grid-cols-3 gap-8">
           <div className="glass-card p-8">
             <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary mb-6">
-              <Globe className="h-6 w-6" />
+              <Globe className="h-6 w-6" aria-hidden="true" />
             </div>
             <h3 className="text-xl font-bold mb-3">Localized Info</h3>
             <p className="text-secondary text-sm leading-relaxed">
@@ -53,9 +54,9 @@ export default function Home() {
           </div>
           <div className="glass-card p-8">
             <div className="w-12 h-12 rounded-2xl bg-green-500/10 flex items-center justify-center text-green-600 mb-6">
-              <ShieldCheck className="h-6 w-6" />
+              <ShieldCheck className="h-6 w-6" aria-hidden="true" />
             </div>
-            <h3 className="text-xl font-bold mb-3">Neutral & Factual</h3>
+            <h3 className="text-xl font-bold mb-3">Neutral &amp; Factual</h3>
             <p className="text-secondary text-sm leading-relaxed">
               Our AI is strictly grounded in official election commission data, providing unbiased
               and verified instructions.
@@ -63,7 +64,7 @@ export default function Home() {
           </div>
           <div className="glass-card p-8">
             <div className="w-12 h-12 rounded-2xl bg-orange-500/10 flex items-center justify-center text-orange-600 mb-6">
-              <Sparkles className="h-6 w-6" />
+              <Sparkles className="h-6 w-6" aria-hidden="true" />
             </div>
             <h3 className="text-xl font-bold mb-3">Instant Answers</h3>
             <p className="text-secondary text-sm leading-relaxed">

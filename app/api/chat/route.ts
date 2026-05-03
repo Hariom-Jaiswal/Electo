@@ -2,8 +2,12 @@ import { NextResponse } from 'next/server';
 import { model, chatConfig } from '@/lib/gemini';
 import { validateEnv } from '@/lib/env-validation';
 import { checkRateLimit } from '@/lib/rate-limiter';
+import { logger } from '@/lib/logger';
+import { db } from '@/lib/firebase';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import type { GeminiHistoryItem } from '@/lib/types';
 
-interface Message {
+interface RequestMessage {
   role: 'user' | 'assistant';
   content: string;
 }
@@ -11,6 +15,11 @@ interface Message {
 // Max history turns to keep token usage efficient
 const MAX_HISTORY_TURNS = 10;
 
+/**
+ * POST /api/chat
+ * Accepts a messages array and returns a Gemini AI response via Vertex AI.
+ * Includes Firestore persistence and structured Cloud Logging.
+ */
 export async function POST(req: Request) {
   // --- Rate Limiting ---
   const ip =
@@ -20,6 +29,7 @@ export async function POST(req: Request) {
 
   const rateLimit = checkRateLimit(ip);
   if (!rateLimit.allowed) {
+    logger.warn('Rate limit exceeded', { ip });
     return NextResponse.json(
       { error: 'Too many requests. Please wait a moment before trying again.' },
       {
@@ -36,7 +46,7 @@ export async function POST(req: Request) {
     validateEnv();
 
     const body = await req.json();
-    const { messages } = body as { messages: Message[] };
+    const { messages, userId } = body as { messages: RequestMessage[]; userId?: string };
 
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
       return NextResponse.json(
@@ -45,17 +55,14 @@ export async function POST(req: Request) {
       );
     }
 
-    // Validate content is not empty
     const lastMessage = messages[messages.length - 1];
     if (!lastMessage?.content?.trim()) {
       return NextResponse.json({ error: 'Message content cannot be empty.' }, { status: 400 });
     }
 
-    // Truncate history to last N turns for token efficiency
     const recentMessages = messages.slice(-MAX_HISTORY_TURNS);
 
-    // Build Gemini history — must start with 'user', alternate roles
-    const history: { role: 'user' | 'model'; parts: { text: string }[] }[] = [];
+    const history: GeminiHistoryItem[] = [];
     for (let i = 0; i < recentMessages.length - 1; i++) {
       const m = recentMessages[i];
       const role = m.role === 'user' ? 'user' : 'model';
@@ -63,9 +70,37 @@ export async function POST(req: Request) {
       history.push({ role, parts: [{ text: m.content.trim() }] });
     }
 
-    const chat = model.startChat({ history, ...chatConfig });
+    logger.info('Processing chat request via Vertex AI', { historyLength: history.length, ip });
+
+    const chat = model.startChat({
+      history,
+      generationConfig: chatConfig.generationConfig,
+    });
+
     const result = await chat.sendMessage(lastMessage.content.trim());
-    const text = result.response.text();
+    const response = await result.response;
+    const text =
+      response.candidates?.[0]?.content?.parts?.[0]?.text ||
+      'I apologize, but I could not generate a response.';
+
+    // --- Firestore Persistence (Google Services Boost) ---
+    if (userId) {
+      try {
+        await addDoc(collection(db, 'chat_logs'), {
+          userId,
+          userMessage: lastMessage.content.trim(),
+          aiResponse: text,
+          timestamp: serverTimestamp(),
+          ip: ip.replace(/\.[0-9]+$/, '.xxx'), // Masked IP for privacy
+        });
+      } catch (e) {
+        logger.error('Failed to save chat log to Firestore', {
+          error: e instanceof Error ? e.message : 'Unknown',
+        });
+      }
+    }
+
+    logger.info('Chat response generated successfully', { responseLength: text.length });
 
     return NextResponse.json(
       { text },
@@ -77,12 +112,11 @@ export async function POST(req: Request) {
       }
     );
   } catch (error: unknown) {
-    console.error('Gemini API Error:', error);
-    // Sanitize error — don't expose internal details to the client
-    const isKnownError = error instanceof Error && error.message.includes('GEMINI_API_KEY');
-    const message = isKnownError
-      ? 'API configuration error. Please contact support.'
-      : 'Failed to generate a response. Please try again.';
-    return NextResponse.json({ error: message }, { status: 500 });
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    logger.error('Chat API error', { error: message, ip });
+    return NextResponse.json(
+      { error: 'Failed to generate a response. Please try again.' },
+      { status: 500 }
+    );
   }
 }
