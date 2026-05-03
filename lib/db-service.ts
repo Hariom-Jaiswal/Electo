@@ -82,7 +82,7 @@ export const getUserSessions = async (userId: string): Promise<PersistedSession[
     const sessionsRef = collection(db, 'sessions');
     const q = query(sessionsRef, where('userId', '==', userId), orderBy('updatedAt', 'desc'));
     const querySnapshot = await getDocs(q);
-    return querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    return querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as PersistedSession);
   } catch (error) {
     logger.error('Error fetching sessions from Firestore', {
       error: error instanceof Error ? error.message : 'Unknown error',
