@@ -23,7 +23,7 @@ export default function FAQSection({ faqs }: { faqs: FAQ[] }) {
 
           return (
             <div
-              key={faq.id || faq.question}
+              key={faq.question}
               className={`glass-card overflow-hidden transition-all ${ringClass}`}
             >
               <button
