@@ -20,7 +20,7 @@ export default function Home() {
           </h1>
           <p className="text-xl text-secondary max-w-2xl mx-auto mb-10 leading-relaxed">
             Your personal AI assistant for everything election-related. From registration deadlines
-            to polling day procedures, we've got you covered.
+            to polling day procedures, we&apos;ve got you covered.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="/chat" className="btn-primary flex items-center gap-2 w-full sm:w-auto">

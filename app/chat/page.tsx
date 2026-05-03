@@ -1,5 +1,5 @@
 import ChatWindow from '@/components/ChatWindow';
-import { Bot, Sparkles, ShieldAlert } from 'lucide-react';
+import { Sparkles, ShieldAlert } from 'lucide-react';
 
 export default function ChatPage() {
   return (
@@ -46,7 +46,7 @@ export default function ChatPage() {
               <ShieldAlert className="h-5 w-5 text-orange-600 shrink-0" />
               <p className="text-xs text-orange-800 leading-relaxed">
                 <strong>Disclaimer:</strong> This assistant provides general information. For legal
-                or specific electoral issues, always refer to the Election Commission's official
+                or specific electoral issues, always refer to the Election Commission&apos;s official
                 website.
               </p>
             </div>

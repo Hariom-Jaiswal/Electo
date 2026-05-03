@@ -40,7 +40,7 @@ export default function GuidesPage() {
             <BookOpen className="h-6 w-6 text-secondary" />
           </div>
           <h3 className="font-bold mb-1">More Guides Coming Soon</h3>
-          <p className="text-xs text-secondary">We're constantly updating our library.</p>
+          <p className="text-xs text-secondary">We&apos;re constantly updating our library.</p>
         </div>
       </div>
 
@@ -49,7 +49,7 @@ export default function GuidesPage() {
           <div>
             <h2 className="text-3xl font-bold mb-6">Need personalized help?</h2>
             <p className="text-secondary leading-relaxed mb-8">
-              If you can't find what you're looking for in our guides, our AI assistant is ready to
+              If you can&apos;t find what you&apos;re looking for in our guides, our AI assistant is ready to
               help you with specific queries about your situation.
             </p>
             <button className="btn-primary">Chat with ElectoAI</button>

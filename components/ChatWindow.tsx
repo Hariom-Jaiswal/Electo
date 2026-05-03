@@ -15,6 +15,7 @@ export default function ChatWindow() {
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsMounted(true);
     setMessages([
       {
@@ -64,7 +65,7 @@ export default function ChatWindow() {
         }),
       });
 
-      const data = await response.json();
+      const data = (await response.json()) as { text: string; error?: string };
 
       if (!response.ok) {
         throw new Error(data.error || 'Failed to get AI response');
@@ -77,12 +78,12 @@ export default function ChatWindow() {
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, assistantMessage]);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Chat Error:', error);
       const errorMessage: Message = {
         id: Date.now().toString(),
         role: 'assistant',
-        content: `Error: ${error.message || 'Something went wrong. Please check your API keys.'}`,
+        content: `Error: ${error instanceof Error ? error.message : 'Something went wrong. Please check your API keys.'}`,
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, errorMessage]);

@@ -1,5 +1,4 @@
 import { POST } from '@/app/api/chat/route';
-import { NextResponse } from 'next/server';
 
 // Mock the Gemini library
 jest.mock('@/lib/gemini', () => ({
