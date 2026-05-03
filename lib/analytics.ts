@@ -1,12 +1,12 @@
 /**
- * Firebase Analytics helper.
+ * Firebase Analytics and Performance helper.
  * Wraps logEvent calls with typed, named event helpers.
  * Only runs client-side (SSR-safe).
  */
 
 import { getAnalytics, logEvent, type Analytics } from 'firebase/analytics';
 import { getPerformance } from 'firebase/performance';
-import { app } from './firebase';
+import { getFirebaseApp } from './firebase';
 
 let analyticsInstance: Analytics | null = null;
 let performanceInitialized = false;
@@ -15,7 +15,7 @@ function getAnalyticsInstance(): Analytics | null {
   if (typeof window === 'undefined') return null;
   try {
     if (!analyticsInstance) {
-      analyticsInstance = getAnalytics(app);
+      analyticsInstance = getAnalytics(getFirebaseApp());
     }
     return analyticsInstance;
   } catch {
@@ -27,7 +27,7 @@ function getAnalyticsInstance(): Analytics | null {
 export function initPerformance(): void {
   if (typeof window === 'undefined' || performanceInitialized) return;
   try {
-    getPerformance(app);
+    getPerformance(getFirebaseApp());
     performanceInitialized = true;
   } catch {
     // Performance not available in all environments

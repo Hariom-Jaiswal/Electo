@@ -1,6 +1,6 @@
-import { initializeApp, getApps, getApp } from 'firebase/app';
-import { getFirestore } from 'firebase/firestore';
-import { getAuth } from 'firebase/auth';
+import { initializeApp, getApps, getApp, type FirebaseApp } from 'firebase/app';
+import { getFirestore, type Firestore } from 'firebase/firestore';
+import { getAuth, type Auth } from 'firebase/auth';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -12,9 +12,50 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
-// Initialize Firebase
-const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
+/**
+ * Shared instance variables.
+ */
+let appInstance: FirebaseApp | null = null;
+let dbInstance: Firestore | null = null;
+let authInstance: Auth | null = null;
 
-export { app, db, auth };
+/**
+ * Lazily initializes and returns the Firebase App instance.
+ * Prevents build-time crashes when API keys are missing.
+ */
+export function getFirebaseApp(): FirebaseApp {
+  if (appInstance) return appInstance;
+
+  if (getApps().length > 0) {
+    appInstance = getApp();
+  } else {
+    // During Next.js build, we might not have keys. 
+    // We return a dummy app or handle the error gracefully at the call site.
+    if (!firebaseConfig.apiKey) {
+      console.warn('Firebase API key is missing. This is expected during the build phase.');
+    }
+    appInstance = initializeApp(firebaseConfig);
+  }
+
+  return appInstance;
+}
+
+/**
+ * Lazily returns the Firestore instance.
+ */
+export function getDb(): Firestore {
+  if (!dbInstance) {
+    dbInstance = getFirestore(getFirebaseApp());
+  }
+  return dbInstance;
+}
+
+/**
+ * Lazily returns the Firebase Auth instance.
+ */
+export function getFirebaseAuth(): Auth {
+  if (!authInstance) {
+    authInstance = getAuth(getFirebaseApp());
+  }
+  return authInstance;
+}

@@ -3,7 +3,7 @@ import { getGeminiModel, chatConfig, safetySettings } from '@/lib/gemini';
 import { validateEnv } from '@/lib/env-validation';
 import { checkRateLimit } from '@/lib/rate-limiter';
 import { logger } from '@/lib/logger';
-import { db } from '@/lib/firebase';
+import { getDb } from '@/lib/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import type { GeminiHistoryItem } from '@/lib/types';
 
@@ -41,7 +41,7 @@ function buildGeminiHistory(messages: RequestMessage[]): GeminiHistoryItem[] {
 async function persistChatLog(userId: string | undefined, userMsg: string, aiResp: string, ip: string) {
   if (!userId) return;
   try {
-    await addDoc(collection(db, 'chat_logs'), {
+    await addDoc(collection(getDb(), 'chat_logs'), {
       userId,
       userMessage: userMsg,
       aiResponse: aiResp,

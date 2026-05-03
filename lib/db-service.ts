@@ -2,7 +2,7 @@
  * Firestore Database Service.
  * Handles persistence for chat sessions and user-specific election data.
  */
-import { db } from './firebase';
+import { getDb } from './firebase';
 import {
   collection,
   addDoc,
@@ -39,7 +39,7 @@ export const saveChatSession = async (
   messages: Message[]
 ): Promise<string | null> => {
   try {
-    const sessionsRef = collection(db, 'sessions');
+    const sessionsRef = collection(getDb(), 'sessions');
     const docRef = await addDoc(sessionsRef, {
       userId,
       messages: messages.map((m) => ({
@@ -79,7 +79,7 @@ interface PersistedSession extends Omit<ChatSession, 'messages'> {
  */
 export const getUserSessions = async (userId: string): Promise<PersistedSession[]> => {
   try {
-    const sessionsRef = collection(db, 'sessions');
+    const sessionsRef = collection(getDb(), 'sessions');
     const q = query(sessionsRef, where('userId', '==', userId), orderBy('updatedAt', 'desc'));
     const querySnapshot = await getDocs(q);
     return querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as PersistedSession);

@@ -1,8 +1,8 @@
 // Mock Firebase to avoid needing real credentials in tests
 jest.mock('@/lib/firebase', () => ({
-  app: {},
-  db: {},
-  auth: {},
+  getFirebaseApp: jest.fn(() => ({})),
+  getDb: jest.fn(() => ({})),
+  getFirebaseAuth: jest.fn(() => ({})),
 }));
 
 // Mock AuthProvider to control auth state in tests

@@ -2,9 +2,9 @@ import { POST } from '@/app/api/chat/route';
 
 // Mock Firebase
 jest.mock('@/lib/firebase', () => ({
-  db: {},
-  app: {},
-  auth: {},
+  getDb: jest.fn(() => ({})),
+  getFirebaseApp: jest.fn(() => ({})),
+  getFirebaseAuth: jest.fn(() => ({})),
 }));
 
 jest.mock('firebase/firestore', () => ({
